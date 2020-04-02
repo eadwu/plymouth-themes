@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=geshin-impact-start
+Description=Genshin Impact web [reduced] start animation
+ModuleName=script
+
+[script]
+ImageDir=@theme_dir@/geshin-impact-start/images
+ScriptFile=@theme_dir@/geshin-impact-start/geshin-impact-start.script

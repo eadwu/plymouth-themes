@@ -1,0 +1,171 @@
+counter = 0;
+Window.SetBackgroundColor(000000);
+
+settings.margin = 10;
+settings.z.background = 20;
+settings.z.dialog = 50;
+
+# png or bmp only...
+background.image = Image("desk.44fb5847.png");
+eye.image = Image("eye.d71defd5.png");
+text.image = Image("desk-text-v3.14b89bda.png");
+eye_blend.image = Image("eye-blend-v3.5ebcb812.png");
+eye_lens.image = Image("eye-lens.7bd56e96.png");
+
+background.sprite = Sprite(background.image);
+eye.sprite = Sprite(eye.image);
+text.sprite = Sprite(text.image);
+eye_blend.sprite = Sprite(eye_blend.image);
+eye_lens.sprite = Sprite(eye_lens.image);
+
+background.x = Window.GetX() + (Window.GetWidth()/2 - background.image.GetWidth()/2);
+background.y = Window.GetY() + (Window.GetHeight()/2 - background.image.GetHeight()/2);
+background.z = settings.z.background;
+background.sprite.SetPosition(background.x, background.y, background.z);
+
+eye.x = Window.GetX() + (Window.GetWidth()/2 - eye.image.GetWidth()/2);
+eye.y = Window.GetY() + (Window.GetHeight()/2 - eye.image.GetHeight()/2);
+eye.z = background.z + 1;
+eye.sprite.SetPosition(eye.x, eye.y, eye.z);
+
+text.x = Window.GetX() + (Window.GetWidth()/2 - text.image.GetWidth()/2);
+text.y = (Window.GetY() + Window.GetHeight()) - text.image.GetHeight() - settings.margin;
+text.z = background.z + 1;
+text.opacity = 0;
+text.sprite.SetOpacity(text.opacity);
+text.sprite.SetPosition(text.x, text.y, text.z);
+
+# TODO: Figure out positioning, invisible for now
+eye_blend.x = Window.GetX() + (Window.GetWidth()/2 - eye_blend.image.GetWidth()/2);
+eye_blend.y = Window.GetY() + (Window.GetHeight()/2 - eye_blend.image.GetHeight()/2);
+eye_blend.z = eye.z + 1;
+eye_blend.sprite.SetOpacity(0);
+eye_blend.sprite.SetPosition(eye_blend.x, eye_blend.y, eye_blend.z);
+
+# TODO: Figure out the purpose of this, invisible for now
+eye_lens.x = Window.GetX() + (Window.GetWidth()/2 - eye_lens.image.GetWidth()/2);
+eye_lens.y = Window.GetY() + (Window.GetHeight()/2 - eye_lens.image.GetHeight()/2);
+eye_lens.z = eye.z + 1;
+eye_lens.sprite.SetOpacity(0);
+eye_lens.sprite.SetPosition(eye_lens.x, eye_lens.y, eye_lens.z);
+
+fun refresh_callback()
+  {
+    if (global.text && text.opacity < 1)
+      {
+        text.opacity = text.opacity + 0.05;
+        text.sprite.SetOpacity(text.opacity);
+      }
+
+    # TODO: Ideally this should blink eye_blend and eye_lens
+
+    counter++;
+  }
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+#----------------------------------------- Dialogue --------------------------------
+
+fun dialog_setup()
+  {
+    local.box;
+    local.lock;
+    local.entry;
+
+    box.image = Image("box.png");
+    lock.image = Image("lock.png");
+    entry.image = Image("entry.png");
+
+    box.sprite = Sprite(box.image);
+    box.x = Window.GetX() + Window.GetWidth()/2 - box.image.GetWidth()/2;
+    box.y = Window.GetY() + settings.margin;
+    box.z = settings.z.dialog;
+    box.sprite.SetPosition(box.x, box.y, box.z);
+
+    entry.sprite = Sprite(entry.image);
+    entry.x = lock.x + lock.image.GetWidth();
+    entry.y = box.y + box.image.GetHeight()/2 - entry.image.GetHeight()/2;
+    entry.z = box.z + 1;
+    entry.sprite.SetPosition(entry.x, entry.y, entry.z);
+
+    lock.sprite = Sprite(lock.image);
+    lock.x = box.x + box.image.GetWidth()/2 - (lock.image.GetWidth() + entry.image.GetWidth()) / 2;
+    lock.y = box.y + box.image.GetHeight()/2 - lock.image.GetHeight()/2;
+    lock.z = entry.z + 1;
+    lock.sprite.SetPosition(lock.x, lock.y, lock.z);
+
+    global.dialog.box = box;
+    global.dialog.entry = entry;
+    global.dialog.lock = lock;
+    dialog_opacity(1);
+  }
+
+fun dialog_opacity(opacity)
+  {
+    dialog.box.sprite.SetOpacity(opacity);
+    dialog.entry.sprite.SetOpacity(opacity);
+    dialog.lock.sprite.SetOpacity(opacity);
+  }
+
+fun display_normal_callback()
+  {
+    if (global.dialog)
+      dialog_opacity(0);
+  }
+
+fun display_password_callback(prompt, bullets)
+  {
+    if (!global.dialog)
+      dialog_setup();
+    else
+      dialog_opacity(1);
+  }
+
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+
+#----------------------------------------- Quit --------------------------------
+
+fun quit_callback()
+  {
+    if (global.background)
+      background.sprite.SetOpacity(0);
+    if (global.eye)
+      eye.sprite.SetOpacity(0);
+    if (global.text)
+      text.sprite.SetOpacity(0);
+    if (global.eye_blend)
+      eye_blend.sprite.SetOpacity(0);
+    if (global.eye_lens)
+      eye_lens.sprite.SetOpacity(0);
+  }
+
+Plymouth.SetQuitFunction(quit_callback);
+
+#----------------------------------------- Message --------------------------------
+
+fun display_message_callback(text)
+  {
+    local.message;
+
+    if (!message.sprite)
+      message.sprite = Sprite();
+
+    message.image = Image.Text(text, 1, 1, 1);
+    message.sprite.SetImage(message.image);
+    message.x = Window.GetX() + Window.GetWidth() - message.image.GetWidth() - settings.margin;
+    message.y = Window.GetY() + Window.GetHeight() - message.image.GetHeight() - settings.margin;
+    message.z = 100;
+    message.sprite.SetPosition(message.x, message.y, message.z);
+
+    global.message = message;
+  }
+
+fun hide_message_callback(text)
+  {
+    if (global.message)
+      message.sprite = Sprite();
+  }
+
+Plymouth.SetDisplayMessageFunction(display_message_callback);
+Plymouth.SetHideMessageFunction(hide_message_callback);
