@@ -4,8 +4,10 @@ Window.SetBackgroundColor(000000);
 settings.margin = 10;
 settings.z.background = 20;
 settings.z.dialog = 50;
+settings.z.message = 100;
+settings.message.history = 5;
 
-# png or bmp only...
+# Initialize background
 background.image = Image("desk.44fb5847.png");
 eye.image = Image("eye.d71defd5.png");
 text.image = Image("desk-text-v3.14b89bda.png");
@@ -144,27 +146,62 @@ Plymouth.SetQuitFunction(quit_callback);
 
 #----------------------------------------- Message --------------------------------
 
+fun message_setup()
+  {
+    local.messages;
+
+    for (i = 0; i < settings.message.history; i++)
+      {
+        messages[i].sprite = Sprite();
+        messages[i].x = 0;
+        messages[i].z = settings.z.message;
+      }
+
+    global.messages = messages;
+  }
+
 fun display_message_callback(text)
   {
-    local.message;
+    if (!global.messages)
+      message_setup();
 
-    if (!message.sprite)
-      message.sprite = Sprite();
+    for (i = settings.message.history - 1; i > 0; i--)
+      {
+        if (messages[i - 1].image)
+          {
+            messages[i].image = messages[i - 1].image;
+            messages[i].sprite.SetImage(messages[i].image);
+            messages[i].sprite.SetOpacity(0);
+          }
+      }
 
-    message.image = Image.Text(text, 1, 1, 1);
-    message.sprite.SetImage(message.image);
-    message.x = Window.GetX() + Window.GetWidth() - message.image.GetWidth() - settings.margin;
-    message.y = Window.GetY() + Window.GetHeight() - message.image.GetHeight() - settings.margin;
-    message.z = 100;
-    message.sprite.SetPosition(message.x, message.y, message.z);
+    messages[0].image = Image.Text(text, 1, 1, 1);
+    messages[0].sprite.SetImage(messages[0].image);
+    messages[0].x = Window.GetX() + Window.GetWidth() - messages[0].image.GetWidth() - settings.margin;
+    messages[0].y = Window.GetY() + Window.GetHeight() - messages[0].image.GetHeight() - settings.margin;
+    messages[0].sprite.SetOpacity(1);
+    messages[0].sprite.SetPosition(messages[0].x, messages[0].y, messages[0].z);
 
-    global.message = message;
+    for (i = 1; i < settings.message.history; i++)
+      {
+        messages[i].x = Window.GetX() + Window.GetWidth() - messages[i].image.GetWidth() - settings.margin;
+        messages[i].y = messages[i - 1].y - messages[i].image.GetHeight() - settings.margin;
+
+        if (messages[i].image)
+          {
+            messages[i].sprite.SetOpacity(1);
+            messages[i].sprite.SetPosition(messages[i].x, messages[i].y, messages[0].z);
+          }
+      }
   }
 
 fun hide_message_callback(text)
   {
-    if (global.message)
-      message.sprite = Sprite();
+    if (global.messages)
+      {
+        for (i = 0; i < settings.message.history; i++)
+          messages[i].sprite.SetOpacity(0);
+      }
   }
 
 Plymouth.SetDisplayMessageFunction(display_message_callback);
