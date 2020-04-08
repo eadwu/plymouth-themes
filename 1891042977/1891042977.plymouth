@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=1891042977
+Description=Wallpaper Engine Workshop Item 1891042977
+ModuleName=script
+
+[script]
+ImageDir=@theme_dir@/1891042977/images
+ScriptFile=@theme_dir@/1891042977/1891042977.script
