@@ -25,6 +25,8 @@ let
     '' + optionalString (images != null) ''
       tar xzf ${images} -C $out/share/plymouth/themes/${pname}
     '' + optionalString (args ? postInstall) args.postInstall;
+
+    passthru.themePrefix = "share/plymouth/themes/${pname}";
   });
 in {
   inherit mkTheme;
