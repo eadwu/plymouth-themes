@@ -27,6 +27,8 @@ let
     '' + optionalString (args ? postInstall) args.postInstall;
   });
 in {
+  inherit mkTheme;
+
   "1891042977" = mkTheme {
     pname = "1891042977";
     version = "2020-04-07";
