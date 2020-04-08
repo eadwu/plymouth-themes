@@ -5,7 +5,7 @@ with nixpkgs;
 let
   themes = builtins.attrNames (lib.filterAttrs (_: v: v == "directory") (builtins.readDir ./.));
 
-  mkTheme = { pname, version, src, images }: stdenv.mkDerivation {
+  mkTheme = { pname, version, src, images ? null }: stdenv.mkDerivation {
     inherit pname version src;
 
     patchPhase = ''
@@ -24,13 +24,24 @@ let
       tar xzf ${images} -C $out/share/plymouth/themes/${pname}
     '';
   };
-in lib.genAttrs themes
-  (theme: let
-    themedir = ./. + "/${theme}";
-    _args = import "${themedir}/spec.nix";
-    images = if (builtins.pathExists "${themedir}/source.nix")
-      then import "${themedir}/source.nix" { inherit requireFile; }
-      else null;
+in {
+  "1891042977" = mkTheme {
+    pname = "1891042977";
+    version = "2020-04-07";
+    src = lib.cleanSource ./1891042977;
+    images = import ./1891042977/source.nix { inherit requireFile; };
+  };
 
-    args = _args // { inherit images; src = lib.cleanSource themedir; };
-  in mkTheme args)
+  "1987238292" = mkTheme {
+    pname = "1987238292";
+    version = "2020-04-07";
+    src = lib.cleanSource ./1987238292;
+    images = import ./1987238292/source.nix { inherit requireFile; };
+  };
+
+  geshin-impact-start = mkTheme {
+    pname = "geshin-impact-start";
+    version = "1.0.38";
+    src = lib.cleanSource ./geshin-impact-start;
+  };
+}
