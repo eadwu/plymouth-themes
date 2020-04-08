@@ -3,7 +3,7 @@
 (
   requireFile rec {
     name = "1987238292.tar.gz";
-    sha256 = "0qxv0az22q43wchb6i0cr6llpisb3baaq68hcfbdnd8mw26gyhal";
+    sha256 = "0adfrvnw4d931v282w1965b3rjfhsj7yz4b9ph715h30h372mlr1";
     message = "${name} is missing from NIX_STORE.";
   }
 ).overrideAttrs (_: { allowSubstitutes = true; })
