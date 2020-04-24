@@ -1,0 +1,10 @@
+advpng:
+  level: 4
+
+optipng:
+  level: 7
+  strip: true
+
+pngquant:
+  max_colors: 256
+  speed: 1

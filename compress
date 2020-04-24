@@ -1,0 +1,4 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p image_optim advancecomp optipng pngcrush pngout pngquant
+
+image_optim --config-paths .image_optim.yml --recursive --no-pack
